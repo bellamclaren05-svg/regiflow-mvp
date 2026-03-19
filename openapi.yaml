@@ -1,0 +1,69 @@
+openapi: 3.0.3
+info:
+  title: RegiFlow API
+  version: 0.1.0
+paths:
+  /api/matters:
+    get:
+      summary: List matters or get single matter
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: string
+          required: false
+          description: UUID of a specific matter
+      responses:
+        '200':
+          description: Matter(s)
+    post:
+      summary: Create a matter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                reference:
+                  type: string
+                completion_date:
+                  type: string
+                  format: date
+      responses:
+        '201':
+          description: Created matter
+  /api/requisitions:
+    get:
+      summary: List requisitions for a matter
+      parameters:
+        - in: query
+          name: matter_id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Requisitions list
+    post:
+      summary: Create a requisition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [matter_id, description]
+              properties:
+                matter_id:
+                  type: string
+                description:
+                  type: string
+                raised_by:
+                  type: string
+      responses:
+        '201':
+          description: Created requisition
