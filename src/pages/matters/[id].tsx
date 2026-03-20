@@ -70,7 +70,7 @@ export default function MatterDetailPage() {
       </div>
 
       <SDLTCountdown completionDate={matter.completion_date} />
-      <AP1Checklist />
+      <AP1Checklist matterId={matter.id} />
       <RequisitionList matterId={matter.id} />
 
       {/* Real uploader */}
