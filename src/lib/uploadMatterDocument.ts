@@ -37,4 +37,3 @@ export async function uploadMatterDocument(
 
   return { storagePath, documentType: documentType || "Other" };
 }
-``

@@ -162,4 +162,3 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
     </div>
   );
 }
-``
