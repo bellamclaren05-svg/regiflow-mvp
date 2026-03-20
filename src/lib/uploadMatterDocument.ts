@@ -4,7 +4,11 @@ function sanitizeFileName(name: string) {
   return name.replace(/[^\w.\-]+/g, "_");
 }
 
-export async function uploadMatterDocument(matterId: string, file: File) {
+export async function uploadMatterDocument(
+  matterId: string,
+  file: File,
+  documentType?: string
+) {
   const safeName = sanitizeFileName(file.name);
   const storagePath = `${matterId}/${crypto.randomUUID()}_${safeName}`;
 
@@ -17,14 +21,16 @@ export async function uploadMatterDocument(matterId: string, file: File) {
 
   if (uploadError) throw uploadError;
 
-  const { error: insertError } = await supabase.from("documents").insert({
-    matter_id: matterId,
-    file_name: file.name,
-    storage_bucket: "matter-documents",
-    storage_path: storagePath,
-    mime_type: file.type,
-    size_bytes: file.size,
-  });
+const { error: insertError } = await supabase.from("documents").insert({
+  matter_id: matterId,
+  file_name: file.name,
+  storage_bucket: "matter-documents",
+  storage_path: storagePath,
+  mime_type: file.type,
+  size_bytes: file.size,
+  document_type: documentType || null,
+});
+
 
   if (insertError) throw insertError;
 
