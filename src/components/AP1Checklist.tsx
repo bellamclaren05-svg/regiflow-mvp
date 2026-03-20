@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 
 const AP1_ITEMS = [
   'AP1 form completed and signed',
@@ -13,13 +14,84 @@ const AP1_ITEMS = [
   'AP1 submitted to Land Registry',
 ];
 
-export default function AP1Checklist() {
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
+type Task = {
+  id: string;
+  label: string;
+  completed: boolean;
+};
 
-  const toggle = (i: number) =>
-    setChecked((prev) => ({ ...prev, [i]: !prev[i] }));
+export default function AP1Checklist({ matterId }: { matterId: string }) {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const doneCount = Object.values(checked).filter(Boolean).length;
+  async function loadTasks() {
+    if (!matterId) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('matter_id', matterId)
+        .order('created_at');
+
+      if (error) throw error;
+
+      // If no tasks exist, create them
+      if (!data || data.length === 0) {
+        const newTasks = AP1_ITEMS.map(label => ({
+          matter_id: matterId,
+          label,
+          completed: false,
+        }));
+
+        const { data: inserted, error: insertError } = await supabase
+          .from('tasks')
+          .insert(newTasks)
+          .select();
+
+        if (insertError) throw insertError;
+        setTasks(inserted || []);
+      } else {
+        setTasks(data);
+      }
+    } catch (err: any) {
+      console.error('Failed to load tasks:', err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function toggleTask(taskId: string, completed: boolean) {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed })
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      setTasks(prev => prev.map(t =>
+        t.id === taskId ? { ...t, completed } : t
+      ));
+    } catch (err: any) {
+      console.error('Failed to update task:', err);
+    }
+  }
+
+  useEffect(() => {
+    loadTasks();
+  }, [matterId]);
+
+  const doneCount = tasks.filter(t => t.completed).length;
+
+  if (loading) {
+    return (
+      <div className="card">
+        <h2>AP1 Readiness Checklist</h2>
+        <div style={{ fontSize: 14, color: '#666' }}>Loading…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="card">
@@ -28,21 +100,18 @@ export default function AP1Checklist() {
         <span className="text-muted">{doneCount} / {AP1_ITEMS.length}</span>
       </div>
       <ul className="checklist mt-2">
-        {AP1_ITEMS.map((item, i) => (
-          <li key={i} className={checked[i] ? 'done' : ''}>
+        {tasks.map((task) => (
+          <li key={task.id} className={task.completed ? 'done' : ''}>
             <input
               type="checkbox"
-              id={`ap1-${i}`}
-              checked={!!checked[i]}
-              onChange={() => toggle(i)}
+              id={`ap1-${task.id}`}
+              checked={task.completed}
+              onChange={(e) => toggleTask(task.id, e.target.checked)}
             />
-            <label htmlFor={`ap1-${i}`}>{item}</label>
+            <label htmlFor={`ap1-${task.id}`}>{task.label}</label>
           </li>
         ))}
       </ul>
-      <p className="text-muted mt-2" style={{ fontSize: '.8rem' }}>
-        ⚠ Checklist state is local only — persistence coming in a future release.
-      </p>
     </div>
   );
 }
