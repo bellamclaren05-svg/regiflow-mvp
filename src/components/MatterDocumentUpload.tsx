@@ -21,7 +21,6 @@ const DOCUMENT_TYPES = [
   "Certificate",
   "Other",
 ];
-``
 
 export default function MatterDocumentUpload({ matterId }: { matterId: string }) {
   const [uploading, setUploading] = useState(false);
@@ -56,7 +55,7 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
     setMessage("");
 
     try {
-      await uploadMatterDocument(matterId, file);
+      await uploadMatterDocument(matterId, file, documentType);
       setMessage("Uploaded successfully ✅");
       e.target.value = "";
       await refreshDocs();
@@ -76,31 +75,30 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
     <div style={{ padding: 12, border: "1px solid #ddd", borderRadius: 12 }}>
       <div style={{ marginBottom: 8, fontWeight: 600 }}>Upload document</div>
 
-    <div style={{ marginBottom: 8 }}>
-  <label style={{ fontSize: 14, display: "block", marginBottom: 6 }}>
-    Document type
-  </label>
+      <div style={{ marginBottom: 8 }}>
+        <label style={{ fontSize: 14, display: "block", marginBottom: 6 }}>
+          Document type
+        </label>
 
-  <select
-    value={documentType}
-    onChange={(e) => setDocumentType(e.target.value)}
-    style={{
-      padding: 8,
-      borderRadius: 8,
-      border: "1px solid #ddd",
-      width: "100%",
-    }}
-  >
-    {DOCUMENT_TYPES.map((t) => (
-      <option key={t} value={t}>
-        {t}
-      </option>
-    ))}
-  </select>
-</div>
+        <select
+          value={documentType}
+          onChange={(e) => setDocumentType(e.target.value)}
+          style={{
+            padding: 8,
+            borderRadius: 8,
+            border: "1px solid #ddd",
+            width: "100%",
+          }}
+        >
+          {DOCUMENT_TYPES.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+      </div>
 
-<input type="file" onChange={onFileChange} disabled={uploading} />
-``
+      <input type="file" onChange={onFileChange} disabled={uploading} />
 
       <div style={{ marginTop: 8, fontSize: 14 }}>
         {uploading ? "Uploading..." : message}
@@ -130,7 +128,16 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                   }}
                 >
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 320 }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        maxWidth: 320,
+                      }}
+                    >
                       {d.file_name}
                     </div>
                     <div style={{ fontSize: 12, color: "#777" }}>
@@ -138,7 +145,12 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                     </div>
                   </div>
 
-                  <a href={url} target="_blank" rel="noreferrer" style={{ fontSize: 14 }}>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ fontSize: 14 }}
+                  >
                     Open
                   </a>
                 </div>
@@ -150,3 +162,4 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
     </div>
   );
 }
+``
