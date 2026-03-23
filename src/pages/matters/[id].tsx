@@ -9,6 +9,7 @@ import AP1Checklist from "@/components/AP1Checklist";
 import RequisitionList from "@/components/RequisitionList";
 import MatterDocumentUpload from "@/components/MatterDocumentUpload";
 import MissingDocsPanel from "@/components/MissingDocsPanel";
+import MatterTasksPanel from "@/components/MatterTasksPanel";
 import { formatDate } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -60,13 +61,13 @@ export default function MatterDetailPage() {
         }),
       });
 
-      // If API returns an error, surface it quickly
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error ? JSON.stringify(data.error) : "Failed to save flags");
+        throw new Error(
+          data?.error ? JSON.stringify(data.error) : "Failed to save flags"
+        );
       }
 
-      // Refresh matter data (so page stays in sync)
       await mutateMatter();
     } catch (e: any) {
       alert(e?.message || "Failed to save flags");
@@ -206,7 +207,7 @@ export default function MatterDetailPage() {
         </button>
       </div>
 
-      {/* Missing docs panel (the magic) */}
+      {/* Missing docs panel (✅/❌ + create tasks button) */}
       <MissingDocsPanel
         matter={{
           ...matter,
@@ -216,6 +217,9 @@ export default function MatterDetailPage() {
         }}
         docs={docs ?? []}
       />
+
+      {/* Tasks panel (shows created tasks and lets you tick them) */}
+      <MatterTasksPanel matterId={matter.id} />
     </>
   );
 }
