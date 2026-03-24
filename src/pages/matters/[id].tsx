@@ -26,7 +26,7 @@ export default function MatterDetailPage() {
   } = useSWR<Matter>(id ? `/api/matters?id=${id}` : null, fetcher);
 
   // Fetch documents (with document_type) for missing-docs automation
-  const { data: docs } = useSWR<any[]>(
+  const { data: docs, mutate: mutateDocs } = useSWR<any[]>(
     matter?.id ? `/api/documents?matterId=${matter.id}` : null,
     fetcher
   );
@@ -44,6 +44,16 @@ export default function MatterDetailPage() {
     setIsLeasehold(!!(matter as any).is_leasehold);
     setHasMortgage(!!(matter as any).has_mortgage);
   }, [matter?.id]);
+
+  // IMPORTANT: Listen for docs-updated events (from uploader) and refresh docs SWR
+  useEffect(() => {
+    function onDocsUpdated() {
+      mutateDocs();
+    }
+
+    window.addEventListener("docs-updated", onDocsUpdated);
+    return () => window.removeEventListener("docs-updated", onDocsUpdated);
+  }, [mutateDocs]);
 
   async function saveMatterFlags() {
     if (!matter?.id) return;
