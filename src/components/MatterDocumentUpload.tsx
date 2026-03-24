@@ -59,6 +59,9 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       setMessage("Uploaded successfully ✅");
       e.target.value = "";
       await refreshDocs();
+
+      // IMPORTANT: tell Tasks panel to refresh (instant flip)
+      window.dispatchEvent(new Event("tasks-updated"));
     } catch (err: any) {
       setMessage(`Upload failed: ${err?.message || "Unknown error"}`);
     } finally {

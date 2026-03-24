@@ -1,4 +1,5 @@
 import useSWR from "swr";
+import { useEffect } from "react";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -16,12 +17,27 @@ export default function MatterTasksPanel({ matterId }: { matterId: string }) {
     fetcher
   );
 
-  const missingDocTasks = (tasks ?? []).filter((t) => t.label?.startsWith("Missing doc:"));
-  const otherTasks = (tasks ?? []).filter((t) => !t.label?.startsWith("Missing doc:"));
+  // Listen for "tasks-updated" event and re-fetch tasks immediately
+  useEffect(() => {
+    function onTasksUpdated() {
+      mutate();
+    }
+
+    window.addEventListener("tasks-updated", onTasksUpdated);
+    return () => window.removeEventListener("tasks-updated", onTasksUpdated);
+  }, [mutate]);
+
+  const missingDocTasks = (tasks ?? []).filter((t) =>
+    t.label?.startsWith("Missing doc:")
+  );
+  const otherTasks = (tasks ?? []).filter(
+    (t) => !t.label?.startsWith("Missing doc:")
+  );
 
   async function toggleTask(taskId: string, completed: boolean) {
-    // Optimistic UI update
     const current = tasks ?? [];
+
+    // Optimistic UI update
     mutate(
       current.map((t) => (t.id === taskId ? { ...t, completed } : t)),
       false
@@ -34,15 +50,13 @@ export default function MatterTasksPanel({ matterId }: { matterId: string }) {
     });
 
     if (!res.ok) {
-      // rollback if patch fails
-      await mutate();
+      await mutate(); // rollback
       const err = await res.json().catch(() => ({}));
       alert(err?.error || "Failed to update task");
       return;
     }
 
-    // revalidate
-    await mutate();
+    await mutate(); // revalidate
   }
 
   return (
@@ -50,10 +64,14 @@ export default function MatterTasksPanel({ matterId }: { matterId: string }) {
       <h2>Tasks</h2>
 
       <div style={{ marginTop: 10 }}>
-        <div style={{ fontWeight: 700, marginBottom: 6 }}>Missing document tasks</div>
+        <div style={{ fontWeight: 700, marginBottom: 6 }}>
+          Missing document tasks
+        </div>
 
         {missingDocTasks.length === 0 ? (
-          <div style={{ fontSize: 14, color: "#666" }}>No missing-doc tasks yet.</div>
+          <div style={{ fontSize: 14, color: "#666" }}>
+            No missing-doc tasks yet.
+          </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {missingDocTasks.map((t) => (
@@ -75,7 +93,12 @@ export default function MatterTasksPanel({ matterId }: { matterId: string }) {
                     checked={!!t.completed}
                     onChange={(e) => toggleTask(t.id, e.target.checked)}
                   />
-                  <span style={{ fontSize: 14, textDecoration: t.completed ? "line-through" : "none" }}>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      textDecoration: t.completed ? "line-through" : "none",
+                    }}
+                  >
                     {t.label}
                   </span>
                 </div>
@@ -115,7 +138,12 @@ export default function MatterTasksPanel({ matterId }: { matterId: string }) {
                     checked={!!t.completed}
                     onChange={(e) => toggleTask(t.id, e.target.checked)}
                   />
-                  <span style={{ fontSize: 14, textDecoration: t.completed ? "line-through" : "none" }}>
+                  <span
+                    style={{
+                      fontSize: 14,
+                      textDecoration: t.completed ? "line-through" : "none",
+                    }}
+                  >
                     {t.label}
                   </span>
                 </div>
