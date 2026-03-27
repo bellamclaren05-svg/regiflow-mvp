@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const path = router.pathname;
 
   return (
     <div className="app-shell">
@@ -15,30 +14,30 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="nav">
-          <Link href="/" className={path === "/" ? "active" : ""}>
-            📊 Dashboard
+          <Link href="/" className={router.pathname === "/" ? "active" : ""}>
+            Dashboard
           </Link>
-          <Link href="/matters/new" className={path === "/matters/new" ? "active" : ""}>
-            ➕ New matter
+          <Link
+            href="/matters/new"
+            className={router.pathname === "/matters/new" ? "active" : ""}
+          >
+            New matter
           </Link>
         </nav>
-
-        <div style={{ marginTop: 18, padding: "12px", color: "var(--muted)", fontSize: 13 }}>
-          <div style={{ fontWeight: 700, marginBottom: 6 }}>Workflow</div>
-          <div>Upload → Validate → Lodge</div>
-        </div>
       </aside>
 
       <div className="main">
         <header className="topbar">
-          <h1>{path === "/" ? "Dashboard" : "Matter"}</h1>
+          <div className="topbar-left">
+            <h1>{router.pathname.startsWith("/matters") ? "Matters" : "Dashboard"}</h1>
+          </div>
 
           <div className="search">
-            🔎
+            <span style={{ fontSize: 14, color: "var(--muted)" }}>🔎</span>
             <input placeholder="Search matters…" />
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <div className="topbar-right">
             <span className="badge badge-info">MVP</span>
           </div>
         </header>
@@ -50,3 +49,4 @@ export default function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
+``

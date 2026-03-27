@@ -283,3 +283,26 @@ input:focus, select:focus, button:focus {
   .topbar { position: relative; }
   .search { max-width: 100%; }
 }
+
+/* --- Spacing helpers to prevent “bunched” layout --- */
+.container > * + * {
+  margin-top: 14px;
+}
+
+/* Make cards and sections breathe */
+.card {
+  margin-bottom: 14px;
+}
+
+/* Headings spacing */
+h1 { margin: 0 0 10px 0; }
+h2 { margin: 0 0 10px 0; }
+
+/* Make form blocks not jam together */
+label { display: block; margin-bottom: 6px; }
+select, input, button { margin-top: 6px; }
+
+/* Ensure main area has padding even if something overrides it */
+.content {
+  padding: 18px !important;
+}
