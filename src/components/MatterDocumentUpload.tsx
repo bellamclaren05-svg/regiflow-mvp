@@ -58,9 +58,12 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       await uploadMatterDocument(matterId, file, documentType);
       setMessage("Uploaded successfully ✅");
       e.target.value = "";
+
+      // refresh THIS component's document list
       await refreshDocs();
 
-      // IMPORTANT: tell Tasks panel to refresh (instant flip)
+      // IMPORTANT: tell the rest of the page to refresh docs + tasks
+      window.dispatchEvent(new Event("docs-updated"));
       window.dispatchEvent(new Event("tasks-updated"));
     } catch (err: any) {
       setMessage(`Upload failed: ${err?.message || "Unknown error"}`);
