@@ -324,6 +324,8 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
 
                   {/* Open link */}
                   
+                    {/* Open link */}
+                  
                     href={url}
                     target="_blank"
                     rel="noreferrer"
@@ -338,6 +340,7 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                     }}
                   >
                     Open <IconOpen />
+                  </a>
                   </a>
                 </div>
               );
