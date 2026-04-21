@@ -23,8 +23,6 @@ const DOCUMENT_TYPES = [
   "Other",
 ];
 
-// ── Icons ─────────────────────────────────────────────────────────────────────
-
 const IconUpload = () => (
   <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
     <path d="M6.5 9V2M4 4.5L6.5 2 9 4.5" stroke="currentColor"
@@ -52,8 +50,6 @@ const IconOpen = () => (
   </svg>
 );
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 function formatDocDate(iso: string) {
   try {
     return new Date(iso).toLocaleDateString("en-GB", {
@@ -63,8 +59,6 @@ function formatDocDate(iso: string) {
     return "";
   }
 }
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function MatterDocumentUpload({ matterId }: { matterId: string }) {
   const [uploading, setUploading]       = useState(false);
@@ -79,7 +73,10 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       const rows = await listMatterDocuments(matterId);
       setDocs(rows as DocRow[]);
     } catch (err: any) {
-      setMessage({ text: `Could not load documents: ${err?.message || "Unknown error"}`, ok: false });
+      setMessage({
+        text: `Could not load documents: ${err?.message || "Unknown error"}`,
+        ok: false,
+      });
     } finally {
       setLoadingDocs(false);
     }
@@ -104,7 +101,10 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       window.dispatchEvent(new Event("docs-updated"));
       window.dispatchEvent(new Event("tasks-updated"));
     } catch (err: any) {
-      setMessage({ text: `Upload failed: ${err?.message || "Unknown error"}`, ok: false });
+      setMessage({
+        text: `Upload failed: ${err?.message || "Unknown error"}`,
+        ok: false,
+      });
     } finally {
       setUploading(false);
     }
@@ -133,21 +133,28 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
 
   return (
     <div>
-      {/* ── Upload row ── */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr auto",
-        gap: 10,
-        alignItems: "flex-end",
-        marginBottom: 16,
-      }}>
 
-        {/* Document type */}
+      {/* Upload row */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr auto",
+          gap: 10,
+          alignItems: "flex-end",
+          marginBottom: 16,
+        }}
+      >
+        {/* Document type select */}
         <div>
-          <label style={{
-            display: "block", fontSize: 12, fontWeight: 500,
-            color: "var(--text-secondary)", marginBottom: 5,
-          }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              fontWeight: 500,
+              color: "var(--text-secondary)",
+              marginBottom: 5,
+            }}
+          >
             Document type
           </label>
           <select
@@ -163,7 +170,6 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
               border: "1px solid var(--border-strong)",
               borderRadius: 8,
               outline: "none",
-              appearance: "none" as const,
               cursor: "pointer",
             }}
           >
@@ -175,27 +181,32 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
 
         {/* File picker */}
         <div>
-          <label style={{
-            display: "block", fontSize: 12, fontWeight: 500,
-            color: "var(--text-secondary)", marginBottom: 5,
-          }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 12,
+              fontWeight: 500,
+              color: "var(--text-secondary)",
+              marginBottom: 5,
+            }}
+          >
             File
           </label>
-          <label style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            padding: "8px 12px",
-            background: "var(--bg-page)",
-            border: "1px solid var(--border-strong)",
-            borderRadius: 8,
-            fontSize: 13,
-            color: "var(--text-secondary)",
-            cursor: uploading ? "not-allowed" : "pointer",
-            overflow: "hidden",
-            whiteSpace: "nowrap" as const,
-            textOverflow: "ellipsis",
-          }}>
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              padding: "8px 12px",
+              background: "var(--bg-page)",
+              border: "1px solid var(--border-strong)",
+              borderRadius: 8,
+              fontSize: 13,
+              color: "var(--text-secondary)",
+              cursor: uploading ? "not-allowed" : "pointer",
+              overflow: "hidden",
+            }}
+          >
             <IconDoc />
             Choose file…
             <input
@@ -223,7 +234,6 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
             fontSize: 13,
             fontWeight: 500,
             cursor: uploading ? "not-allowed" : "pointer",
-            whiteSpace: "nowrap" as const,
             height: 36,
           }}
         >
@@ -232,31 +242,35 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
         </button>
       </div>
 
-      {/* ── Status message ── */}
+      {/* Status message */}
       {message && (
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 6,
-          fontSize: 12.5,
-          fontWeight: 500,
-          marginBottom: 14,
-          color: message.ok ? "var(--success)" : "var(--danger)",
-        }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            fontSize: 12.5,
+            fontWeight: 500,
+            marginBottom: 14,
+            color: message.ok ? "var(--success)" : "var(--danger)",
+          }}
+        >
           {message.ok ? "✓" : "✕"} {message.text}
         </div>
       )}
 
-      {/* ── Document list ── */}
+      {/* Document list */}
       <div>
-        <div style={{
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.05em",
-          textTransform: "uppercase" as const,
-          color: "var(--text-muted)",
-          marginBottom: 8,
-        }}>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
+            color: "var(--text-muted)",
+            marginBottom: 8,
+          }}
+        >
           Uploaded Documents
         </div>
 
@@ -267,14 +281,16 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
         )}
 
         {!loadingDocs && docs.length === 0 && (
-          <div style={{
-            fontSize: 12.5,
-            color: "var(--text-muted)",
-            padding: "10px 14px",
-            background: "#FAFBFF",
-            border: "1px solid var(--border)",
-            borderRadius: 8,
-          }}>
+          <div
+            style={{
+              fontSize: 12.5,
+              color: "var(--text-muted)",
+              padding: "10px 14px",
+              background: "#FAFBFF",
+              border: "1px solid var(--border)",
+              borderRadius: 8,
+            }}
+          >
             No documents uploaded yet.
           </div>
         )}
@@ -284,36 +300,42 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
             {docs.map((d) => {
               const url = getPublicUrl(d.storage_bucket, d.storage_path);
               return (
-                <div key={d.id} style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  padding: "10px 14px",
-                  background: "var(--bg-card)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                }}>
-                  {/* File info */}
-                  <div style={{
+                <div
+                  key={d.id}
+                  style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 10,
-                    minWidth: 0,
-                    flex: 1,
-                  }}>
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "10px 14px",
+                    background: "var(--bg-card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 10,
+                      minWidth: 0,
+                      flex: 1,
+                    }}
+                  >
                     <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
                       <IconDoc />
                     </span>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{
-                        fontSize: 13,
-                        fontWeight: 500,
-                        color: "var(--text-primary)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}>
+                      <div
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: "var(--text-primary)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
                         {d.file_name}
                       </div>
                       <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1 }}>
@@ -321,10 +343,6 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                       </div>
                     </div>
                   </div>
-
-                  {/* Open link */}
-                  
-                    {/* Open link */}
                   
                     href={url}
                     target="_blank"
@@ -340,7 +358,6 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                     }}
                   >
                     Open <IconOpen />
-                  </a>
                   </a>
                 </div>
               );
