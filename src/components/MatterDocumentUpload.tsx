@@ -1,4 +1,3 @@
-// src/components/MatterDocumentUpload.tsx
 import { useEffect, useState } from "react";
 import { uploadMatterDocument } from "../lib/uploadMatterDocument";
 import { listMatterDocuments } from "../lib/listMatterDocuments";
@@ -125,7 +124,6 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
   return (
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 10, alignItems: "flex-end", marginBottom: 16 }}>
-
         <div>
           <label style={{ display: "block", fontSize: 12, fontWeight: 500, color: "var(--text-secondary)", marginBottom: 5 }}>
             Document type
@@ -173,7 +171,9 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
         </div>
 
         {loadingDocs && (
-          <div style={{ fontSize: 12.5, color: "var(--text-muted)", padding: "10px 0" }}>Loading…</div>
+          <div style={{ fontSize: 12.5, color: "var(--text-muted)", padding: "10px 0" }}>
+            Loading…
+          </div>
         )}
 
         {!loadingDocs && docs.length === 0 && (
