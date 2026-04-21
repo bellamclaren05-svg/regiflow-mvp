@@ -94,10 +94,8 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
   async function onFileChange(e: any) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploading(true);
     setMessage(null);
-
     try {
       await uploadMatterDocument(matterId, file, documentType);
       setMessage({ text: "Uploaded successfully", ok: true });
@@ -116,6 +114,22 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
     const { data } = supabase.storage.from(bucket).getPublicUrl(path);
     return data.publicUrl;
   }
+
+  const linkStyle: React.CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 5,
+    padding: "5px 10px",
+    background: "var(--bg-page)",
+    border: "1px solid var(--border-strong)",
+    borderRadius: 7,
+    fontSize: 12,
+    fontWeight: 500,
+    color: "var(--text-secondary)",
+    textDecoration: "none",
+    flexShrink: 0,
+    transition: "border-color 0.12s, color 0.12s",
+  };
 
   return (
     <div>
@@ -149,7 +163,7 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
               border: "1px solid var(--border-strong)",
               borderRadius: 8,
               outline: "none",
-              appearance: "none",
+              appearance: "none" as const,
               cursor: "pointer",
             }}
           >
@@ -159,7 +173,7 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
           </select>
         </div>
 
-        {/* File picker — styled label over hidden input */}
+        {/* File picker */}
         <div>
           <label style={{
             display: "block", fontSize: 12, fontWeight: 500,
@@ -168,15 +182,18 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
             File
           </label>
           <label style={{
-            display: "flex", alignItems: "center", gap: 7,
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
             padding: "8px 12px",
             background: "var(--bg-page)",
             border: "1px solid var(--border-strong)",
             borderRadius: 8,
-            fontSize: 13, color: "var(--text-secondary)",
+            fontSize: 13,
+            color: "var(--text-secondary)",
             cursor: uploading ? "not-allowed" : "pointer",
             overflow: "hidden",
-            whiteSpace: "nowrap",
+            whiteSpace: "nowrap" as const,
             textOverflow: "ellipsis",
           }}>
             <IconDoc />
@@ -194,14 +211,19 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
         <button
           disabled={uploading}
           style={{
-            display: "inline-flex", alignItems: "center", gap: 6,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
             padding: "8px 14px",
             background: uploading ? "var(--border)" : "var(--accent)",
             color: uploading ? "var(--text-muted)" : "#fff",
-            border: "none", borderRadius: 8,
-            fontFamily: "var(--font)", fontSize: 13, fontWeight: 500,
+            border: "none",
+            borderRadius: 8,
+            fontFamily: "var(--font)",
+            fontSize: 13,
+            fontWeight: 500,
             cursor: uploading ? "not-allowed" : "pointer",
-            whiteSpace: "nowrap",
+            whiteSpace: "nowrap" as const,
             height: 36,
           }}
         >
@@ -213,8 +235,12 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       {/* ── Status message ── */}
       {message && (
         <div style={{
-          display: "flex", alignItems: "center", gap: 6,
-          fontSize: 12.5, fontWeight: 500, marginBottom: 14,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          fontSize: 12.5,
+          fontWeight: 500,
+          marginBottom: 14,
           color: message.ok ? "var(--success)" : "var(--danger)",
         }}>
           {message.ok ? "✓" : "✕"} {message.text}
@@ -224,8 +250,11 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
       {/* ── Document list ── */}
       <div>
         <div style={{
-          fontSize: 11, fontWeight: 500, letterSpacing: "0.05em",
-          textTransform: "uppercase", color: "var(--text-muted)",
+          fontSize: 11,
+          fontWeight: 500,
+          letterSpacing: "0.05em",
+          textTransform: "uppercase" as const,
+          color: "var(--text-muted)",
           marginBottom: 8,
         }}>
           Uploaded Documents
@@ -239,7 +268,8 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
 
         {!loadingDocs && docs.length === 0 && (
           <div style={{
-            fontSize: 12.5, color: "var(--text-muted)",
+            fontSize: 12.5,
+            color: "var(--text-muted)",
             padding: "10px 14px",
             background: "#FAFBFF",
             border: "1px solid var(--border)",
@@ -255,8 +285,10 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
               const url = getPublicUrl(d.storage_bucket, d.storage_path);
               return (
                 <div key={d.id} style={{
-                  display: "flex", alignItems: "center",
-                  justifyContent: "space-between", gap: 12,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
                   padding: "10px 14px",
                   background: "var(--bg-card)",
                   border: "1px solid var(--border)",
@@ -264,17 +296,22 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                 }}>
                   {/* File info */}
                   <div style={{
-                    display: "flex", alignItems: "center",
-                    gap: 10, minWidth: 0, flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    minWidth: 0,
+                    flex: 1,
                   }}>
                     <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
                       <IconDoc />
                     </span>
                     <div style={{ minWidth: 0 }}>
                       <div style={{
-                        fontSize: 13, fontWeight: 500,
+                        fontSize: 13,
+                        fontWeight: 500,
                         color: "var(--text-primary)",
-                        overflow: "hidden", textOverflow: "ellipsis",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                       }}>
                         {d.file_name}
@@ -290,18 +327,7 @@ export default function MatterDocumentUpload({ matterId }: { matterId: string })
                     href={url}
                     target="_blank"
                     rel="noreferrer"
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 5,
-                      padding: "5px 10px",
-                      background: "var(--bg-page)",
-                      border: "1px solid var(--border-strong)",
-                      borderRadius: 7,
-                      fontSize: 12, fontWeight: 500,
-                      color: "var(--text-secondary)",
-                      textDecoration: "none",
-                      flexShrink: 0,
-                      transition: "border-color 0.12s, color 0.12s",
-                    }}
+                    style={linkStyle}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)";
                       (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent-text)";
