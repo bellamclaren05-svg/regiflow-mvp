@@ -6,8 +6,6 @@ import { formatDate, sdltDaysRemaining } from "@/lib/utils";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-// ── Inline icons ──────────────────────────────────────────────────────────────
-
 const IconPlus = () => (
   <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
     <path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor"
@@ -32,52 +30,38 @@ const IconEmpty = () => (
   </svg>
 );
 
-// ── SDLT badge ────────────────────────────────────────────────────────────────
-
 function SdltBadge({ completionDate }: { completionDate: string | null | undefined }) {
   const days = sdltDaysRemaining(completionDate);
-
   if (days === null) {
     return (
       <span style={{
         display: "inline-flex", alignItems: "center",
         padding: "2px 8px", borderRadius: 20,
         fontSize: 11, fontWeight: 500,
-        background: "#F1F3F9", color: "var(--text-muted)",
+        background: "rgba(99,120,180,0.1)", color: "var(--text-muted)",
       }}>
         No date
       </span>
     );
   }
-
-  const overdue  = days < 0;
-  const urgent   = days >= 0 && days <= 3;
-  const ok       = days > 3;
-
-  const style = overdue ? {
-    bg: "var(--danger-soft)", text: "var(--danger)",
-    label: `${Math.abs(days)}d overdue`,
-  } : urgent ? {
-    bg: "var(--warning-soft)", text: "var(--warning)",
-    label: `${days}d left`,
-  } : {
-    bg: "var(--success-soft)", text: "var(--success)",
-    label: `${days}d left`,
-  };
-
+  const overdue = days < 0;
+  const urgent  = days >= 0 && days <= 3;
+  const cfg = overdue
+    ? { bg: "var(--danger-soft)",  text: "var(--danger)",  label: `${Math.abs(days)}d overdue` }
+    : urgent
+    ? { bg: "var(--warning-soft)", text: "var(--warning)", label: `${days}d left` }
+    : { bg: "var(--success-soft)", text: "var(--success)", label: `${days}d left` };
   return (
     <span style={{
       display: "inline-flex", alignItems: "center",
       padding: "2px 8px", borderRadius: 20,
       fontSize: 11, fontWeight: 500,
-      background: style.bg, color: style.text,
+      background: cfg.bg, color: cfg.text,
     }}>
-      {style.label}
+      {cfg.label}
     </span>
   );
 }
-
-// ── Status badge ──────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: string }) {
   const s = (status ?? "").toLowerCase();
@@ -85,7 +69,7 @@ function StatusBadge({ status }: { status: string }) {
     s === "active"   ? { bg: "var(--accent-soft)",  text: "var(--accent-text)" } :
     s === "complete" ? { bg: "var(--success-soft)",  text: "var(--success)" }    :
     s === "pending"  ? { bg: "var(--warning-soft)",  text: "var(--warning)" }    :
-                       { bg: "#F1F3F9",              text: "var(--text-secondary)" };
+                       { bg: "rgba(99,120,180,0.1)", text: "var(--text-secondary)" };
   return (
     <span style={{
       display: "inline-flex", alignItems: "center",
@@ -98,58 +82,34 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// ── Type pills ────────────────────────────────────────────────────────────────
-
 function TypePills({ matter }: { matter: Matter }) {
-  const tx = (matter as any).transaction_type as string | null;
+  const tx       = (matter as any).transaction_type as string | null;
   const leasehold = !!(matter as any).is_leasehold;
   const mortgage  = !!(matter as any).has_mortgage;
-
   if (!tx && !leasehold && !mortgage) {
     return <span style={{ color: "var(--text-muted)", fontSize: 12 }}>—</span>;
   }
-
-  const pillStyle = (bg: string, text: string): React.CSSProperties => ({
-    display: "inline-flex", alignItems: "center",
-    padding: "2px 7px", borderRadius: 20,
-    fontSize: 11, fontWeight: 500,
-    background: bg, color: text, marginRight: 4,
-  });
-
+  const pill = (bg: string, text: string, label: string) => (
+    <span style={{
+      display: "inline-flex", alignItems: "center",
+      padding: "2px 7px", borderRadius: 20,
+      fontSize: 11, fontWeight: 500,
+      background: bg, color: text, marginRight: 4,
+    }}>
+      {label}
+    </span>
+  );
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 3 }}>
-      {tx === "purchase" && (
-        <span style={pillStyle("var(--accent-soft)", "var(--accent-text)")}>
-          Purchase
-        </span>
-      )}
-      {tx === "sale" && (
-        <span style={pillStyle("#FFF7ED", "#92400E")}>
-          Sale
-        </span>
-      )}
-      {leasehold && (
-        <span style={pillStyle("var(--success-soft)", "var(--success)")}>
-          Leasehold
-        </span>
-      )}
-      {mortgage && (
-        <span style={pillStyle("var(--warning-soft)", "var(--warning)")}>
-          Mortgage
-        </span>
-      )}
+      {tx === "purchase" && pill("var(--accent-soft)", "var(--accent-text)", "Purchase")}
+      {tx === "sale"     && pill("rgba(210,153,34,0.15)", "var(--warning)", "Sale")}
+      {leasehold         && pill("var(--success-soft)", "var(--success)", "Leasehold")}
+      {mortgage          && pill("var(--warning-soft)", "var(--warning)", "Mortgage")}
     </div>
   );
 }
 
-// ── Stat card ─────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  valueColour,
-  sub,
-}: {
+function StatCard({ label, value, valueColour, sub }: {
   label: string;
   value: string | number;
   valueColour?: string;
@@ -183,12 +143,9 @@ function StatCard({
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
-
 export default function IndexPage() {
   const { data, error, isLoading } = useSWR<Matter[]>("/api/matters", fetcher);
 
-  // Derive summary stats from loaded data
   const active   = data?.filter((m) => m.status?.toLowerCase() === "active").length  ?? 0;
   const complete = data?.filter((m) => m.status?.toLowerCase() === "complete").length ?? 0;
   const urgent   = data?.filter((m) => {
@@ -200,7 +157,7 @@ export default function IndexPage() {
   return (
     <div style={{ maxWidth: 960, margin: "0 auto" }}>
 
-      {/* ── Page header ── */}
+      {/* Header */}
       <div style={{
         display: "flex", alignItems: "center",
         justifyContent: "space-between", marginBottom: 22,
@@ -216,49 +173,42 @@ export default function IndexPage() {
             Post-completion workflow dashboard
           </div>
         </div>
-
         <Link href="/matters/new" style={{
           display: "inline-flex", alignItems: "center", gap: 6,
           padding: "8px 14px",
           background: "var(--accent)", color: "#fff",
           borderRadius: 8, fontSize: 13, fontWeight: 500,
           textDecoration: "none",
-          transition: "opacity 0.15s",
         }}>
           <IconPlus /> New Matter
         </Link>
       </div>
 
-      {/* ── Stats row (only when data loaded) ── */}
+      {/* Stats */}
       {data && data.length > 0 && (
         <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 12,
-          marginBottom: 20,
+          display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
+          gap: 12, marginBottom: 20,
         }}>
-          <StatCard label="Total Matters"  value={total}    sub="All time" />
-          <StatCard label="Active"         value={active}   valueColour="var(--accent-text)"  sub="In progress" />
-          <StatCard label="SDLT Urgent"    value={urgent}   valueColour="var(--warning)"      sub="Due in ≤3 days" />
-          <StatCard label="Completed"      value={complete} valueColour="var(--success)"      sub="Closed matters" />
+          <StatCard label="Total Matters" value={total}    sub="All time" />
+          <StatCard label="Active"        value={active}   valueColour="var(--accent-text)"  sub="In progress" />
+          <StatCard label="SDLT Urgent"   value={urgent}   valueColour="var(--warning)"      sub="Due in 3 days" />
+          <StatCard label="Completed"     value={complete} valueColour="var(--success)"      sub="Closed matters" />
         </div>
       )}
 
-      {/* ── Loading ── */}
+      {/* Loading */}
       {isLoading && (
-        <div style={{
-          display: "flex", alignItems: "center", gap: 8,
-          color: "var(--text-muted)", fontSize: 13, padding: "40px 0",
-        }}>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, padding: "40px 0" }}>
           Loading matters…
         </div>
       )}
 
-      {/* ── Error ── */}
+      {/* Error */}
       {error && (
         <div style={{
           background: "var(--danger-soft)",
-          border: "1px solid rgba(220,38,38,0.2)",
+          border: "1px solid rgba(248,81,73,0.2)",
           borderRadius: 8, padding: "12px 16px",
           fontSize: 13, color: "var(--danger)",
         }}>
@@ -266,7 +216,7 @@ export default function IndexPage() {
         </div>
       )}
 
-      {/* ── Empty state ── */}
+      {/* Empty */}
       {data && data.length === 0 && (
         <div style={{
           background: "var(--bg-card)",
@@ -295,7 +245,7 @@ export default function IndexPage() {
         </div>
       )}
 
-      {/* ── Table ── */}
+      {/* Table */}
       {data && data.length > 0 && (
         <div style={{
           background: "var(--bg-card)",
@@ -303,8 +253,6 @@ export default function IndexPage() {
           borderRadius: 10,
           overflow: "hidden",
         }}>
-
-          {/* Table header bar */}
           <div style={{
             display: "flex", alignItems: "center",
             justifyContent: "space-between",
@@ -330,7 +278,7 @@ export default function IndexPage() {
                       letterSpacing: "0.05em", textTransform: "uppercase",
                       color: "var(--text-muted)",
                       padding: "9px 16px",
-                      background: "#FAFBFF",
+                      background: "var(--bg-page)",
                       borderBottom: "1px solid var(--border)",
                       whiteSpace: "nowrap",
                     }}>
@@ -343,11 +291,16 @@ export default function IndexPage() {
                 {data.map((m, i) => (
                   <tr
                     key={m.id}
-                    style={{ borderBottom: i < data.length - 1 ? "1px solid var(--border)" : "none" }}
+                    style={{
+                      borderBottom: i < data.length - 1
+                        ? "1px solid var(--border)"
+                        : "none",
+                      transition: "background 0.12s",
+                    }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLTableRowElement)
                         .querySelectorAll("td")
-                        .forEach((td) => ((td as HTMLElement).style.background = "#FAFBFF"));
+                        .forEach((td) => ((td as HTMLElement).style.background = "var(--accent-soft)"));
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLTableRowElement)
@@ -355,7 +308,6 @@ export default function IndexPage() {
                         .forEach((td) => ((td as HTMLElement).style.background = "transparent"));
                     }}
                   >
-                    {/* Title */}
                     <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
                       <Link href={`/matters/${m.id}`} style={{
                         fontSize: 13, fontWeight: 500,
@@ -364,8 +316,6 @@ export default function IndexPage() {
                         {m.title}
                       </Link>
                     </td>
-
-                    {/* Reference */}
                     <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
                       <span style={{
                         fontFamily: "var(--font-mono)", fontSize: 11.5,
@@ -374,49 +324,43 @@ export default function IndexPage() {
                         {m.reference ?? "—"}
                       </span>
                     </td>
-
-                    {/* Type pills */}
                     <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
                       <TypePills matter={m} />
                     </td>
-
-                    {/* Completion date */}
                     <td style={{
                       padding: "12px 16px", verticalAlign: "middle",
                       color: "var(--text-secondary)", whiteSpace: "nowrap",
                     }}>
                       {formatDate(m.completion_date)}
                     </td>
-
-                    {/* SDLT countdown */}
                     <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
                       <SdltBadge completionDate={m.completion_date} />
                     </td>
-
-                    {/* Status */}
                     <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
                       <StatusBadge status={m.status} />
                     </td>
-
-                    {/* View link */}
                     <td style={{
                       padding: "12px 16px", verticalAlign: "middle",
                       textAlign: "right", whiteSpace: "nowrap",
                     }}>
-                      <Link href={`/matters/${m.id}`} style={{
-                        display: "inline-flex", alignItems: "center", gap: 5,
-                        padding: "5px 10px",
-                        background: "var(--bg-page)",
-                        border: "1px solid var(--border-strong)",
-                        borderRadius: 7, fontSize: 12, fontWeight: 500,
-                        color: "var(--text-secondary)", textDecoration: "none",
-                        transition: "border-color 0.12s, color 0.12s",
-                      }}
+                      <Link
+                        href={`/matters/${m.id}`}
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: 5,
+                          padding: "5px 10px",
+                          background: "transparent",
+                          border: "1px solid var(--border-strong)",
+                          borderRadius: 7, fontSize: 12, fontWeight: 500,
+                          color: "var(--text-secondary)", textDecoration: "none",
+                          transition: "border-color 0.12s, color 0.12s, background 0.12s",
+                        }}
                         onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.background = "var(--accent-soft)";
                           (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--accent)";
                           (e.currentTarget as HTMLAnchorElement).style.color = "var(--accent-text)";
                         }}
                         onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
                           (e.currentTarget as HTMLAnchorElement).style.borderColor = "var(--border-strong)";
                           (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)";
                         }}
